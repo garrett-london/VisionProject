@@ -20,7 +20,6 @@ class Model:
             raise ValueError(f"Module provided ({model.fc.out_features} features)"
                              f" does not match the labels provided ({len(labels)} labels)")
         self._model = model.to(torch.device("cuda:0"))
-        # self._model = model.to("cpu")
         self.threshold = float(threshold)
 
     @classmethod

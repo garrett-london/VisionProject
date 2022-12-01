@@ -11,20 +11,17 @@ import numpy as np
 
 path = r"Images"
 
-
 def train_loop(training_set, model) -> model:
     size = len(training_set.dataset)
     current = 0
     for batch, data in enumerate(training_set):
         current += 1
-        # pred = m.predict(X)
         loss = m.run_epoch(data)
-        # if batch % 100 == 0:
         print(f"loss: {loss:>7f}  [{(5 * current):>5d}/{size:>5d}]")
     return m
 
 
-def test_loop(pop, m, loss_fn) -> float:
+def test_loop(pop, m) -> float:
     dataloader, classes = pop
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
@@ -60,7 +57,6 @@ def test_loop(pop, m, loss_fn) -> float:
 if __name__ == '__main__':
     batch = 5
     device = torch.device('cuda:0')
-    # device = 'cpu'
     pop = model.misc.TrainingModel.get_data(root=path, batch_size=batch, shuffle=True, pin_memory=True)
     training_set, classes = pop
     classes = sorted(list(classes.keys()), key=lambda cls: classes[cls])
@@ -72,15 +68,12 @@ if __name__ == '__main__':
     test_loss = 0.0
     correct = 0
     try:
-        print("Training model...")
-
         for t in range(num_epochs):
-            print(f"Epoch {t + 1}\n --------------------")
+            print(f"Epoch {t + 1}\n")
             m = train_loop(training_set, m)
-            # acc = test_loop(pop, m, loss_fn)
-            # if acc >= best_acc:
-            # m.export(r"model/saved_model.pth")
-            # best_accuracy = acc
-        m.export(r"model/saved_model.pth")
+            acc = test_loop(pop, m, loss_fn)
+            if acc >= best_acc:
+                m.export(r"model/saved_model.pth")
+                best_accuracy = acc
     except KeyboardInterrupt:
-        print("Training interrupted")
+        print("Stopped")
